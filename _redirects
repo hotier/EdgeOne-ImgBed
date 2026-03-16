@@ -1,0 +1,8 @@
+# SPA 路由支持
+# 将所有非静态文件的请求重定向到 index.html
+/api/*  /api/:splat  200
+/upload  /upload  200
+/file/*  /file/:splat  200
+/dav/*  /dav/:splat  200
+/random  /random  200
+/*  /index.html  200
