@@ -321,7 +321,7 @@ export async function moderateContent(env, url) {
 }
 
 // 清除CDN缓存
-export async function purgeCDNCache(env, cdnUrl, url, normalizedFolder) {
+export async function clearCDNAndAPICache(env, cdnUrl, url, normalizedFolder) {
     if (env.dev_mode === 'true') {
         return;
     }
@@ -345,7 +345,7 @@ export async function endUpload(context, fileId, metadata) {
     // 清除CDN缓存
     const cdnUrl = `https://${url.hostname}/file/${fileId}`;
     const normalizedFolder = sanitizeUploadFolder(url.searchParams.get('uploadFolder') || '');
-    await purgeCDNCache(env, cdnUrl, url, normalizedFolder);
+    await clearCDNAndAPICache(env, cdnUrl, url, normalizedFolder);
 
     // 更新文件索引（索引更新时会自动计算容量统计）
     await addFileToIndex(context, fileId, metadata);
