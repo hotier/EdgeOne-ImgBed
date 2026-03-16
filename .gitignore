@@ -7,3 +7,6 @@ wrangler.toml
 .kiro/
 .vscode/
 .claude/
+
+public/
+edgeone.json
