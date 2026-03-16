@@ -1,0 +1,41 @@
+{
+  "name": "cloudflare-imgbed",
+  "version": "2.6.3",
+  "build": {
+    "command": "npm run build",
+    "outputDir": "."
+  },
+  "functions": {
+    "runtime": "nodejs18.x"
+  },
+  "kv": {
+    "namespaces": [
+      {
+        "name": "img_url",
+        "description": "Image URL storage"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "pattern": "/api/*",
+      "function": "functions/api/_middleware.js"
+    },
+    {
+      "pattern": "/upload",
+      "function": "functions/upload/index.js"
+    },
+    {
+      "pattern": "/file/*",
+      "function": "functions/file/_middleware.js"
+    },
+    {
+      "pattern": "/dav/*",
+      "function": "functions/dav/_middleware.js"
+    },
+    {
+      "pattern": "/random",
+      "function": "functions/random/index.js"
+    }
+  ]
+}
