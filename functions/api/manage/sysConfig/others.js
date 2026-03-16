@@ -71,6 +71,15 @@ export async function getOthersConfig(db, env) {
         fixed: false,
     }
 
+    // EdgeOne API Token
+    const kvEdgeOneApiToken = settingsKV.edgeOneApiToken || {}
+    settings.edgeOneApiToken = {
+        SECRET_ID: kvEdgeOneApiToken.SECRET_ID || env.EDGEONE_SECRET_ID,
+        SECRET_KEY: kvEdgeOneApiToken.SECRET_KEY || env.EDGEONE_SECRET_KEY,
+        ZONE_ID: kvEdgeOneApiToken.ZONE_ID || env.EDGEONE_ZONE_ID,
+        fixed: false,
+    }
+
     // WebDAV
     const kvWebDAV = settingsKV.webDAV || {}
     settings.webDAV = {

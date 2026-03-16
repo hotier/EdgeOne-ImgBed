@@ -1,5 +1,5 @@
 import { fetchSecurityConfig } from "../utils/sysConfig";
-import { purgeCFCache, purgeRandomFileListCache, purgePublicFileListCache } from "../utils/purgeCache";
+import { purgeCDNCache, purgeRandomFileListCache, purgePublicFileListCache } from "../utils/purgeCache";
 import { addFileToIndex } from "../utils/indexManager.js";
 import { getDatabase } from '../utils/databaseAdapter.js';
 
@@ -328,7 +328,7 @@ export async function purgeCDNCache(env, cdnUrl, url, normalizedFolder) {
 
     // 清除CDN缓存
     try {
-        await purgeCFCache(env, cdnUrl);
+        await purgeCDNCache(env, cdnUrl);
     } catch (error) {
         console.error('Failed to clear CDN cache:', error);
     }

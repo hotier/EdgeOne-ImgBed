@@ -1,4 +1,4 @@
-import { purgeCFCache } from "../../../utils/purgeCache.js";
+import { purgeCDNCache } from "../../../utils/purgeCache.js";
 import { addFileToIndex } from "../../../utils/indexManager.js";
 import { getDatabase } from "../../../utils/databaseAdapter.js";
 import { mergeTags, normalizeTags, validateTag } from "../../../utils/tagHelpers.js";
@@ -176,7 +176,7 @@ async function handleUpdateTags(context, db, fileId, hostname) {
 
         // Clear CDN cache asynchronously (don't wait for it to complete)
         const cdnUrl = `https://${hostname}/file/${fileId}`;
-        waitUntil(purgeCFCache(context.env, cdnUrl));
+        waitUntil(purgeCDNCache(context.env, cdnUrl));
 
         // Update file index asynchronously
         waitUntil(addFileToIndex(context, fileId, fileData.metadata));

@@ -1,5 +1,5 @@
 import { S3Client, CopyObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { purgeCFCache, purgeRandomFileListCache, purgePublicFileListCache } from "../../../utils/purgeCache";
+import { purgeCDNCache, purgeRandomFileListCache, purgePublicFileListCache } from "../../../utils/purgeCache";
 import { moveFileInIndex, batchMoveFilesInIndex } from "../../../utils/indexManager.js";
 import { getDatabase } from '../../../utils/databaseAdapter.js';
 import { sanitizeUploadFolder } from "../../../upload/uploadTools.js";
@@ -175,7 +175,7 @@ async function moveFile(env, fileId, newFileId, cdnUrl, url) {
         await db.delete(fileId);
 
         // 清除CDN缓存
-        await purgeCFCache(env, cdnUrl);
+        await purgeCDNCache(env, cdnUrl);
 
         // 清除 api/randomFileList 等API缓存
         const normalizedFolder = fileId.split('/').slice(0, -1).join('/');

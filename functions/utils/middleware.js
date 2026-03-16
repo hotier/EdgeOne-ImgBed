@@ -1,5 +1,3 @@
-import sentryPlugin from "@cloudflare/pages-plugin-sentry";
-import '@sentry/tracing';
 import { fetchOthersConfig } from "./sysConfig";
 import { checkDatabaseConfig as checkDbConfig } from './databaseAdapter.js';
 
@@ -10,24 +8,7 @@ export async function errorHandling(context) {
   const othersConfig = await fetchOthersConfig(context.env);
   disableTelemetry = !othersConfig.telemetry.enabled;
 
-  const env = context.env;
-  if (!disableTelemetry) {
-    context.data.telemetry = true;
-    let remoteSampleRate = 0.001;
-    try {
-      const sampleRate = await fetchSampleRate(context)
-      //check if the sample rate is not null
-      if (sampleRate) {
-        remoteSampleRate = sampleRate;
-      }
-    } catch (e) { console.log(e) }
-    const sampleRate = env.sampleRate || remoteSampleRate;
-    return sentryPlugin({
-      dsn: "https://44b7b443108ec6d298044b125ff89d28@o4507644548022272.ingest.us.sentry.io/4507644555100160",
-      tracesSampleRate: sampleRate,
-    })(context);;
-  }
-
+  // EdgeOne 平台暂不支持 Sentry 插件，直接继续
   return context.next();
 }
 
@@ -40,47 +21,32 @@ export async function telemetryData(context) {
     try {
       const parsedHeaders = {};
       context.request.headers.forEach((value, key) => {
-        parsedHeaders[key] = value
-        //check if the value is empty
-        if (value.length > 0) {
-          context.data.sentry.setTag(key, value);
-        }
+        parsedHeaders[key] = value;
       });
-      const CF = JSON.parse(JSON.stringify(context.request.cf));
-      const parsedCF = {};
-      for (const key in CF) {
-        if (typeof CF[key] == "object") {
-          parsedCF[key] = JSON.stringify(CF[key]);
-        } else {
-          parsedCF[key] = CF[key];
-          if (CF[key].length > 0) {
-            context.data.sentry.setTag(key, CF[key]);
-          }
-        }
-      }
+      
+      // EdgeOne 平台没有 request.cf 对象，使用 headers 中的信息代替
+      const platformData = {
+        country: context.request.headers.get('cf-ipcountry') || 
+                  context.request.headers.get('x-edgeone-country') || 'Unknown',
+        city: context.request.headers.get('x-edgeone-city') || 'Unknown',
+        asn: context.request.headers.get('x-edgeone-asn') || 'Unknown',
+      };
+      
       const data = {
         headers: parsedHeaders,
-        cf: parsedCF,
+        platform: platformData,
         url: context.request.url,
         method: context.request.method,
         redirect: context.request.redirect,
-      }
-      //get the url path
+      };
+      
+      // 记录请求信息到控制台
       const urlPath = new URL(context.request.url).pathname;
-      const hostname = new URL(context.request.url).hostname;
-      context.data.sentry.setTag("path", urlPath);
-      context.data.sentry.setTag("url", data.url);
-      context.data.sentry.setTag("method", context.request.method);
-      context.data.sentry.setTag("redirect", context.request.redirect);
-      context.data.sentry.setContext("request", data);
-      const transaction = context.data.sentry.startTransaction({ name: `${context.request.method} ${hostname}` });
-      //add the transaction to the context
-      context.data.transaction = transaction;
+      console.log(`[Telemetry] ${context.request.method} ${urlPath}`, data);
+      
       return await context.next();
     } catch (e) {
       console.log(e);
-    } finally {
-      context.data.transaction.finish();
     }
   }
 
@@ -88,28 +54,8 @@ export async function telemetryData(context) {
 }
 
 export async function traceData(context, span, op, name) {
-  const data = context.data
-  if (data.telemetry) {
-    if (span) {
-      console.log("span finish")
-      span.finish();
-    } else {
-      console.log("span start")
-      span = await context.data.transaction.startChild(
-        { op: op, name: name },
-      );
-    }
-  }
-}
-
-async function fetchSampleRate(context) {
-  const data = context.data
-  if (data.telemetry) {
-    const url = "https://frozen-sentinel.pages.dev/signal/sampleRate.json";
-    const response = await fetch(url);
-    const json = await response.json();
-    return json.rate;
-  }
+  // EdgeOne 平台暂不支持 tracing，保留函数签名以兼容
+  console.log(`[Trace] ${op}: ${name}`);
 }
 
 // 检查数据库是否配置

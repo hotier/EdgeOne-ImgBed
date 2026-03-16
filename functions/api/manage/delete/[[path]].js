@@ -1,5 +1,5 @@
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { purgeCFCache, purgeRandomFileListCache, purgePublicFileListCache } from "../../../utils/purgeCache";
+import { purgeCDNCache, purgeRandomFileListCache, purgePublicFileListCache } from "../../../utils/purgeCache";
 import { removeFileFromIndex, batchRemoveFilesFromIndex } from "../../../utils/indexManager.js";
 import { getDatabase } from '../../../utils/databaseAdapter.js';
 import { DiscordAPI } from '../../../utils/discordAPI.js';
@@ -161,7 +161,7 @@ async function deleteFile(env, fileId, cdnUrl, url) {
         await db.delete(fileId);
 
         // 清除CDN缓存
-        await purgeCFCache(env, cdnUrl);
+        await purgeCDNCache(env, cdnUrl);
 
         // 清除 api/randomFileList 等API缓存
         const normalizedFolder = fileId.split('/').slice(0, -1).join('/');

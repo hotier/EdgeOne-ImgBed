@@ -1,5 +1,5 @@
 {
-  "name": "cloudflare-imgbed",
+  "name": "edgeone-imgbed",
   "version": "2.6.3",
   "build": {
     "command": "npm run build",
@@ -12,7 +12,15 @@
     "namespaces": [
       {
         "name": "img_url",
-        "description": "Image URL storage"
+        "description": "Image metadata and settings storage"
+      }
+    ]
+  },
+  "r2": {
+    "buckets": [
+      {
+        "name": "img_r2",
+        "description": "Image file storage (optional, for R2 channels)"
       }
     ]
   },
